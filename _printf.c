@@ -1,4 +1,4 @@
-include "main.h"
+#include "main.h"
 
 /**
  * _printf - produces output according to a format
@@ -8,38 +8,64 @@ include "main.h"
  */
 int _printf(const char *format, ...)
 {
-        va_list args;
-        int count = 0;
-        int i = 0;
-        int j;
-        char *str;
-        char c;
+	va_list args;
+	int count = 0;
+	int i = 0;
+	int j;
+	char *str;
+	char c;
 
-        if (format == NULL)
-                return (-1);
+	if (format == NULL)
+		return (-1);
 
-        va_start(args, format);
-        while (format && format[i])
-        {
-                if (format[i] != '%')
-                {
-                        write(1, &format[i], 1);
-                        count++;
-                }
-                else
-                {
-                        i++;
-                        if (format[i] == 'c')
-                        {
-                                c = va_arg(args, int);
-                                write(1, &c, 1);
-                                count++;
-                        }
-                        else if (format[i] == 's')
-                        {
-                                str = va_arg(args, char *);
-                                if (str == NULL)
-                                        str = "(null)";
-                                for (j = 0; str[j] != '\0'; j++)
-                                {
--- INSERT --                                                                                                                                                                                    2,1           Top
+	va_start(args, format);
+	while (format && format[i])
+	{
+		if (format[i] != '%')
+		{
+			write(1, &format[i], 1);
+			count++;
+		}
+		else
+		{
+			i++;
+			if (format[i] == 'c')
+			{
+				c = va_arg(args, int);
+				write(1, &c, 1);
+				count++;
+			}
+			else if (format[i] == 's')
+			{
+				str = va_arg(args, char *);
+				if (str == NULL)
+					str = "(null)";
+				for (j = 0; str[j] != '\0'; j++)
+				{
+					write(1, &str[j], 1);
+					count++;
+				}
+			}
+			else if (format[i] == '%')
+			{
+				write(1, &format[i], 1);
+				count++;
+			}
+			else if (format[i] == 'd' || format[i] == 'i')
+			{
+				count += print_int(va_arg(args, int));
+			}
+			else if (format[i] == '\0')
+				return (-1);
+			else
+			{
+				write(1, &format[i - 1], 1);
+				write(1, &format[i], 1);
+				count += 2;
+			}
+		}
+		i++;
+	}
+	va_end(args);
+	return (count);
+}
