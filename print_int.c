@@ -10,22 +10,25 @@ int print_int(int n)
 {
 	unsigned int num;
 	int count = 0;
+	char c;
 
 	if (n < 0)
 	{
-		_putchar('-');
+		c = '-';
+		write(1, &c, 1);
 		count++;
-		num = -n;
+		num = (unsigned int)(-n);
 	}
 	else
 	{
-		num = n;
+		num = (unsigned int)n;
 	}
 
 	if (num / 10)
 		count += print_int(num / 10);
 
-	_putchar((num % 10) + '0');
+	c = (num % 10) + '0';
+	write(1, &c, 1);
 	count++;
 
 	return (count);
