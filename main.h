@@ -10,6 +10,7 @@ int _write_buffer(char c);
 
 int print_char(va_list types);
 
+int print_int(int n);
 
 
 
