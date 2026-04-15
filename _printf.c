@@ -63,6 +63,21 @@ int _printf(const char *format, ...)
 					print_buffer(buffer, &buff_ind);
 				count++;
 			}
+			else
+			{
+				if (format[i] == '\0')
+					return (-1);
+
+				buffer[buff_ind++] = '%';
+				if (buff_ind == BUFF_SIZE)
+					print_buffer(buffer, &buff_ind);
+
+				buffer[buff_ind++] = format[i];
+				if (buff_ind == BUFF_SIZE)
+					print_buffer(buffer, &buff_ind);
+
+				count += 2;
+			}
 		}
 		i++;
 	}
