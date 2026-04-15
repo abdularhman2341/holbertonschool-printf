@@ -44,3 +44,12 @@ The function does not support flags or advanced formatting.
 .SH RETURN VALUE
 The _printf function returns the number of characters printed.
 The null byte is not counted.
+
+If something goes wrong, it returns -1.
+
+.SH EXAMPLES
+_printf("Hello %s\n", "world");
+_printf("Number: %d\n", 10);
+_printf("Char: %c\n", 'A');
+_printf("Percent: %%\n");
+
