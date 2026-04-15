@@ -1,0 +1,42 @@
+.TH _printf 3 "April 2026" "_printf Manual" "Custom C Library"
+
+.SH NAME
+_printf \- custom implementation of printf function
+
+.SH SYNOPSIS
+#include "main.h"
+
+int _printf(const char *format, ...);
+
+.SH DESCRIPTION
+The _printf function prints output based on a format string.
+It writes the result to the standard output (stdout).
+
+The format string can include normal text and format specifiers,
+which start with the '%' symbol.
+
+Supported specifiers:
+.TP
+.B %c
+Prints a character.
+.TP
+.B %s
+Prints a string.
+.TP
+.B %%
+Prints a percent sign.
+.TP
+.B %d, %i
+Prints an integer.
+
+If a NULL string is passed to %s, "(null)" will be printed.
+
+The function uses helper functions such as:
+.TP
+.B _write_buffer
+Stores characters in a buffer and prints them when needed.
+.TP
+.B print_int
+Prints integers using recursion.
+
+The function does not support flags or advanced formatting.
