@@ -6,6 +6,8 @@
  *
  * Return: the number of characters printed
  */
+
+
 int _printf(const char *format, ...)
 {
 	va_list args;
@@ -14,6 +16,8 @@ int _printf(const char *format, ...)
 	int j;
 	char *str;
 	char c;
+	char buffer[BUFF_SIZE];
+	int buff_ind = 0;
 
 	if (format == NULL)
 		return (-1);
@@ -23,7 +27,9 @@ int _printf(const char *format, ...)
 	{
 		if (format[i] != '%')
 		{
-			write(1, &format[i], 1);
+			buffer[buff_ind++] = format[i];
+			if (buff_ind == BUFF_SIZE)
+				print_buffer(buffer, &buff_ind);
 			count++;
 		}
 		else
@@ -32,7 +38,9 @@ int _printf(const char *format, ...)
 			if (format[i] == 'c')
 			{
 				c = va_arg(args, int);
-				write(1, &c, 1);
+				buffer[buff_ind++] = c;
+				if (buff_ind == BUFF_SIZE)
+					print_buffer(buffer, &buff_ind);
 				count++;
 			}
 			else if (format[i] == 's')
@@ -42,30 +50,24 @@ int _printf(const char *format, ...)
 					str = "(null)";
 				for (j = 0; str[j] != '\0'; j++)
 				{
-					write(1, &str[j], 1);
+					buffer[buff_ind++] = str[j];
+					if (buff_ind == BUFF_SIZE)
+						print_buffer(buffer, &buff_ind);
 					count++;
 				}
 			}
 			else if (format[i] == '%')
 			{
-				write(1, &format[i], 1);
+				buffer[buff_ind++] = '%';
+				if (buff_ind == BUFF_SIZE)
+					print_buffer(buffer, &buff_ind);
 				count++;
-			}
-			else if (format[i] == 'd' || format[i] == 'i')
-			{
-				count += print_int(va_arg(args, int));
-			}
-			else if (format[i] == '\0')
-				return (-1);
-			else
-			{
-				write(1, &format[i - 1], 1);
-				write(1, &format[i], 1);
-				count += 2;
 			}
 		}
 		i++;
 	}
+	print_buffer(buffer, &buff_ind);
 	va_end(args);
+
 	return (count);
 }
