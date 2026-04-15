@@ -1,4 +1,4 @@
-.TH _printf 3 "April 2026" "_printf Manual" "Custom C Library"
+.TH _printf 3 "April 2026" i"_printf Manual" "Custom C Library"
 
 .SH NAME
 _printf \- custom implementation of printf function
@@ -40,3 +40,7 @@ Stores characters in a buffer and prints them when needed.
 Prints integers using recursion.
 
 The function does not support flags or advanced formatting.
+
+.SH RETURN VALUE
+The _printf function returns the number of characters printed.
+The null byte is not counted.
