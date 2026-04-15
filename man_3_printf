@@ -53,3 +53,8 @@ _printf("Number: %d\n", 10);
 _printf("Char: %c\n", 'A');
 _printf("Percent: %%\n");
 
+
+.SH AUTHORS
+Shouq
+.br
+Abdulrahman
