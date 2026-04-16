@@ -1,67 +1,77 @@
-_printf() Function
+# _printf() Function
+---
 
-_printf - formatted output conversion
+## _printf - formatted output conversion
 
 #include "main.h"
 int _printf(const char *format, ...);
 
-Description
-The _printf() function prints output based on a format string.
-It writes the output to stdout (standard output).
+---
 
-The function processes the format string and prints each part accordingly.
-It supports variadic arguments, meaning it can accept multiple values after the format string.
+## Description
+The _printf() function prints formatted output based on a format string.  
+It writes the result to stdout (standard output stream) and allows multiple values  
+to be printed in a clear and organized way.
 
-Format of the format string
-The format string consists of:
-- Normal characters, which are printed as they are
-- Format specifiers, which start with '%'
+The function processes the format string step by step. Normal characters are printed  
+directly, while special sequences starting with '%' are interpreted as format specifiers  
+that determine how the next argument should be displayed.
 
-Each format specifier tells the function how to handle and print the next argument.
+---
 
-Conversion specifiers
-The supported format specifiers are:
+## Format of the format string
+The format string is composed of two main parts:
 
-d, i:
-Prints an integer in decimal format.
+- Ordinary characters → printed exactly as they are  
+- Conversion specifiers → introduced by '%'  
 
-c:
-Prints a single character.
+Each conversion specifier tells the function how to handle and print the corresponding argument.
 
-s:
-Prints a string.
-If the string is NULL, "(null)" is printed instead.
+---
 
-%:
-Prints a percent sign.
+## Conversion specifiers
 
-About Functions
+| Specifier | Meaning |
+|----------|--------|
+| d, i     | Prints an integer in decimal format |
+| c        | Prints a single character |
+| s        | Prints a string |
+| %        | Prints a percent sign |
 
-int _printf(const char *format, ...)
-The main function that reads the format string and controls the printing process.
+If a NULL string is passed to %s, the function safely prints "(null)".
 
-int print_int(int n)
-Handles integer printing for %d and %i.
-It prints numbers digit by digit and supports negative values.
+---
 
-int _write_buffer(char c)
-Stores characters in a buffer and writes them to stdout.
-This helps make the output process more efficient.
+## About Functions
 
-int print_char(char c)
-Prints a single character when %c is used.
+The project is built using a main function and helper functions, where each one has a clear role.
 
-String handling
-When %s is used, the function prints the string directly.
-If a NULL pointer is passed, it safely prints "(null)".
+The _printf function is the core of the program. It reads the format string, detects specifiers,  
+and decides how each value should be printed.
 
-Return Value
-The _printf() function returns the number of characters printed.
+The print_int function is responsible for printing integers. It handles negative numbers and  
+prints digits in the correct order using recursion.
+
+The _write_buffer function manages the output process. It stores characters and writes them  
+efficiently to stdout using the write system call.
+
+The print_char function is used to print a single character when the %c specifier is used.
+
+For strings, when %s is detected, the string is printed directly. If the string is NULL,  
+the function prints "(null)" instead of causing an error.
+
+---
+
+## Return Value
+
+The _printf() function returns the number of characters printed.  
 The null byte is not included in the count.
 
 If an error occurs, the function returns -1.
 
-Examples
+---
+
+## Examples
 
 #include "main.h"
 
@@ -72,7 +82,9 @@ _printf("%d\n", 123);           // Output: 123
 _printf("%i\n", -456);          // Output: -456
 _printf("%%\n");                // Output: %
 
-Author
+---
 
-Shouq
+## Author
+
+Shouq  
 Abdulrahman
