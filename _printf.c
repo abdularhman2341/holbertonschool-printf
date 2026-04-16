@@ -76,6 +76,11 @@ int _printf(const char *format, ...)
 			{
 				count += print_HEX(va_arg(args, unsigned int), buffer, &buff_ind);
 			}
+
+			else if (format[i] == 'S')
+			{
+				count += print_custom_string(va_arg(args, char *), buffer, &buff_ind);
+			}
 			else if (format[i] == '%')
 			{
 				buffer[buff_ind++] = '%';
@@ -87,7 +92,7 @@ int _printf(const char *format, ...)
 			{
 				if (format[i] == '\0')
 				{
-					print_buffer(buffer, &buff_ind); /* الحل السحري هنا! */
+					print_buffer(buffer, &buff_ind); 
 					return (-1);
 				}
 				buffer[buff_ind++] = '%';
