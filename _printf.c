@@ -60,10 +60,6 @@ int _printf(const char *format, ...)
 			{
 				count += print_binary(va_arg(args, unsigned int), buffer, &buff_ind);
 			}
-			else if (format[i] == 'b')
-			{
-				count += print_binary(va_arg(args, unsigned int), buffer, &buff_ind);
-			}
 			else if (format[i] == 'u')
 			{
 				count += print_unsigned(va_arg(args, unsigned int), buffer, &buff_ind);
@@ -90,7 +86,10 @@ int _printf(const char *format, ...)
 			else
 			{
 				if (format[i] == '\0')
+				{
+					print_buffer(buffer, &buff_ind); /* الحل السحري هنا! */
 					return (-1);
+				}
 				buffer[buff_ind++] = '%';
 				if (buff_ind == BUFF_SIZE)
 					print_buffer(buffer, &buff_ind);
