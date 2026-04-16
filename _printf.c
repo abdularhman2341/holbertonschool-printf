@@ -6,14 +6,10 @@
  *
  * Return: the number of characters printed
  */
-
-
 int _printf(const char *format, ...)
 {
 	va_list args;
-	int count = 0;
-	int i = 0;
-	int j;
+	int count = 0, i = 0, j;
 	char *str;
 	char c;
 	char buffer[BUFF_SIZE];
@@ -55,12 +51,14 @@ int _printf(const char *format, ...)
 						print_buffer(buffer, &buff_ind);
 					count++;
 				}
-
-				else if (format[i] == 'd' || format[i] == 'i')
+			}
+			else if (format[i] == 'd' || format[i] == 'i')
 			{
 				count += print_int(va_arg(args, int), buffer, &buff_ind);
 			}
-
+			else if (format[i] == 'b')
+			{
+				count += print_binary(va_arg(args, unsigned int), buffer, &buff_ind);
 			}
 			else if (format[i] == '%')
 			{
@@ -73,15 +71,12 @@ int _printf(const char *format, ...)
 			{
 				if (format[i] == '\0')
 					return (-1);
-
 				buffer[buff_ind++] = '%';
 				if (buff_ind == BUFF_SIZE)
 					print_buffer(buffer, &buff_ind);
-
 				buffer[buff_ind++] = format[i];
 				if (buff_ind == BUFF_SIZE)
 					print_buffer(buffer, &buff_ind);
-
 				count += 2;
 			}
 		}
@@ -93,7 +88,11 @@ int _printf(const char *format, ...)
 	return (count);
 }
 
-
+/**
+ * print_buffer - Prints the contents of the buffer if it exists
+ * @buffer: Array of chars
+ * @buff_ind: Index at which to add next char, represents the length.
+ */
 void print_buffer(char buffer[], int *buff_ind)
 {
 	if (*buff_ind > 0)

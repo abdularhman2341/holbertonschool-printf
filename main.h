@@ -14,6 +14,8 @@ int print_int(int n, char buffer[], int *buff_ind);
 
 void print_buffer(char buffer[], int *buff_ind);
 
+int print_binary(unsigned int n, char buffer[], int *buff_ind);
+
 #endif /* MAIN_H */
 
 
