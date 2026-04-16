@@ -55,6 +55,12 @@ int _printf(const char *format, ...)
 						print_buffer(buffer, &buff_ind);
 					count++;
 				}
+
+				else if (format[i] == 'd' || format[i] == 'i')
+			{
+				count += print_int(va_arg(args, int), buffer, &buff_ind);
+			}
+
 			}
 			else if (format[i] == '%')
 			{
