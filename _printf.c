@@ -11,8 +11,9 @@ int _printf(const char *format, ...)
 	va_list args;
 	int count = 0, i = 0, j;
 	int flag_plus, flag_space, flag_hash;
-	int n;
-	unsigned int un;
+	int len_long, len_short;
+	long int ln;
+	unsigned long int uln;
 	char *str;
 	char c;
 	char buffer[BUFF_SIZE];
@@ -47,6 +48,18 @@ int _printf(const char *format, ...)
 					flag_hash = 1;
 				i++;
 			}
+			len_long = 0;
+			len_short = 0;
+			if (format[i] == 'l')
+			{
+				len_long = 1;
+				i++;
+			}
+			else if (format[i] == 'h')
+			{
+				len_short = 1;
+				i++;
+			}
 			if (format[i] == 'c')
 			{
 				c = va_arg(args, int);
@@ -70,8 +83,13 @@ int _printf(const char *format, ...)
 			}
 			else if (format[i] == 'd' || format[i] == 'i')
 			{
-				n = va_arg(args, int);
-				if (n >= 0)
+				if (len_long)
+					ln = va_arg(args, long int);
+				else if (len_short)
+					ln = (short int)va_arg(args, int);
+				else
+					ln = va_arg(args, int);
+				if (ln >= 0)
 				{
 					if (flag_plus)
 					{
@@ -88,7 +106,10 @@ int _printf(const char *format, ...)
 						count++;
 					}
 				}
-				count += print_int(n, buffer, &buff_ind);
+				if (len_long || len_short)
+					count += print_long(ln, buffer, &buff_ind);
+				else
+					count += print_int((int)ln, buffer, &buff_ind);
 			}
 			else if (format[i] == 'b')
 			{
@@ -96,24 +117,46 @@ int _printf(const char *format, ...)
 			}
 			else if (format[i] == 'u')
 			{
-				count += print_unsigned(va_arg(args, unsigned int), buffer, &buff_ind);
+				if (len_long)
+					uln = va_arg(args, unsigned long int);
+				else if (len_short)
+					uln = (unsigned short int)va_arg(args, unsigned int);
+				else
+					uln = va_arg(args, unsigned int);
+				if (len_long || len_short)
+					count += print_ulong(uln, buffer, &buff_ind);
+				else
+					count += print_unsigned((unsigned int)uln, buffer, &buff_ind);
 			}
 			else if (format[i] == 'o')
 			{
-				un = va_arg(args, unsigned int);
-				if (flag_hash && un != 0)
+				if (len_long)
+					uln = va_arg(args, unsigned long int);
+				else if (len_short)
+					uln = (unsigned short int)va_arg(args, unsigned int);
+				else
+					uln = va_arg(args, unsigned int);
+				if (flag_hash && uln != 0)
 				{
 					buffer[buff_ind++] = '0';
 					if (buff_ind == BUFF_SIZE)
 						print_buffer(buffer, &buff_ind);
 					count++;
 				}
-				count += print_octal(un, buffer, &buff_ind);
+				if (len_long || len_short)
+					count += print_octal_long(uln, buffer, &buff_ind);
+				else
+					count += print_octal((unsigned int)uln, buffer, &buff_ind);
 			}
 			else if (format[i] == 'x')
 			{
-				un = va_arg(args, unsigned int);
-				if (flag_hash && un != 0)
+				if (len_long)
+					uln = va_arg(args, unsigned long int);
+				else if (len_short)
+					uln = (unsigned short int)va_arg(args, unsigned int);
+				else
+					uln = va_arg(args, unsigned int);
+				if (flag_hash && uln != 0)
 				{
 					buffer[buff_ind++] = '0';
 					if (buff_ind == BUFF_SIZE)
@@ -124,12 +167,20 @@ int _printf(const char *format, ...)
 						print_buffer(buffer, &buff_ind);
 					count++;
 				}
-				count += print_hex(un, buffer, &buff_ind);
+				if (len_long || len_short)
+					count += print_hex_long(uln, buffer, &buff_ind);
+				else
+					count += print_hex((unsigned int)uln, buffer, &buff_ind);
 			}
 			else if (format[i] == 'X')
 			{
-				un = va_arg(args, unsigned int);
-				if (flag_hash && un != 0)
+				if (len_long)
+					uln = va_arg(args, unsigned long int);
+				else if (len_short)
+					uln = (unsigned short int)va_arg(args, unsigned int);
+				else
+					uln = va_arg(args, unsigned int);
+				if (flag_hash && uln != 0)
 				{
 					buffer[buff_ind++] = '0';
 					if (buff_ind == BUFF_SIZE)
@@ -140,7 +191,10 @@ int _printf(const char *format, ...)
 						print_buffer(buffer, &buff_ind);
 					count++;
 				}
-				count += print_HEX(un, buffer, &buff_ind);
+				if (len_long || len_short)
+					count += print_HEX_long(uln, buffer, &buff_ind);
+				else
+					count += print_HEX((unsigned int)uln, buffer, &buff_ind);
 			}
 			else if (format[i] == 'S')
 			{

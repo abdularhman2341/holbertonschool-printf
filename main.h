@@ -28,6 +28,16 @@ int print_custom_string(char *str, char buffer[], int *buff_ind);
 
 int print_pointer(void *p, char buffer[], int *buff_ind);
 
+int print_long(long int n, char buffer[], int *buff_ind);
+
+int print_ulong(unsigned long int n, char buffer[], int *buff_ind);
+
+int print_octal_long(unsigned long int n, char buffer[], int *buff_ind);
+
+int print_hex_long(unsigned long int n, char buffer[], int *buff_ind);
+
+int print_HEX_long(unsigned long int n, char buffer[], int *buff_ind);
+
 #endif /* MAIN_H */
 
 
