@@ -10,6 +10,9 @@ int _printf(const char *format, ...)
 {
 	va_list args;
 	int count = 0, i = 0, j;
+	int flag_plus, flag_space, flag_hash;
+	int n;
+	unsigned int un;
 	char *str;
 	char c;
 	char buffer[BUFF_SIZE];
@@ -31,6 +34,19 @@ int _printf(const char *format, ...)
 		else
 		{
 			i++;
+			flag_plus = 0;
+			flag_space = 0;
+			flag_hash = 0;
+			while (format[i] == '+' || format[i] == ' ' || format[i] == '#')
+			{
+				if (format[i] == '+')
+					flag_plus = 1;
+				else if (format[i] == ' ')
+					flag_space = 1;
+				else
+					flag_hash = 1;
+				i++;
+			}
 			if (format[i] == 'c')
 			{
 				c = va_arg(args, int);
@@ -54,7 +70,25 @@ int _printf(const char *format, ...)
 			}
 			else if (format[i] == 'd' || format[i] == 'i')
 			{
-				count += print_int(va_arg(args, int), buffer, &buff_ind);
+				n = va_arg(args, int);
+				if (n >= 0)
+				{
+					if (flag_plus)
+					{
+						buffer[buff_ind++] = '+';
+						if (buff_ind == BUFF_SIZE)
+							print_buffer(buffer, &buff_ind);
+						count++;
+					}
+					else if (flag_space)
+					{
+						buffer[buff_ind++] = ' ';
+						if (buff_ind == BUFF_SIZE)
+							print_buffer(buffer, &buff_ind);
+						count++;
+					}
+				}
+				count += print_int(n, buffer, &buff_ind);
 			}
 			else if (format[i] == 'b')
 			{
@@ -66,17 +100,48 @@ int _printf(const char *format, ...)
 			}
 			else if (format[i] == 'o')
 			{
-				count += print_octal(va_arg(args, unsigned int), buffer, &buff_ind);
+				un = va_arg(args, unsigned int);
+				if (flag_hash && un != 0)
+				{
+					buffer[buff_ind++] = '0';
+					if (buff_ind == BUFF_SIZE)
+						print_buffer(buffer, &buff_ind);
+					count++;
+				}
+				count += print_octal(un, buffer, &buff_ind);
 			}
 			else if (format[i] == 'x')
 			{
-				count += print_hex(va_arg(args, unsigned int), buffer, &buff_ind);
+				un = va_arg(args, unsigned int);
+				if (flag_hash && un != 0)
+				{
+					buffer[buff_ind++] = '0';
+					if (buff_ind == BUFF_SIZE)
+						print_buffer(buffer, &buff_ind);
+					count++;
+					buffer[buff_ind++] = 'x';
+					if (buff_ind == BUFF_SIZE)
+						print_buffer(buffer, &buff_ind);
+					count++;
+				}
+				count += print_hex(un, buffer, &buff_ind);
 			}
 			else if (format[i] == 'X')
 			{
-				count += print_HEX(va_arg(args, unsigned int), buffer, &buff_ind);
+				un = va_arg(args, unsigned int);
+				if (flag_hash && un != 0)
+				{
+					buffer[buff_ind++] = '0';
+					if (buff_ind == BUFF_SIZE)
+						print_buffer(buffer, &buff_ind);
+					count++;
+					buffer[buff_ind++] = 'X';
+					if (buff_ind == BUFF_SIZE)
+						print_buffer(buffer, &buff_ind);
+					count++;
+				}
+				count += print_HEX(un, buffer, &buff_ind);
 			}
-
 			else if (format[i] == 'S')
 			{
 				count += print_custom_string(va_arg(args, char *), buffer, &buff_ind);
@@ -96,7 +161,7 @@ int _printf(const char *format, ...)
 			{
 				if (format[i] == '\0')
 				{
-					print_buffer(buffer, &buff_ind); 
+					print_buffer(buffer, &buff_ind);
 					return (-1);
 				}
 				buffer[buff_ind++] = '%';
