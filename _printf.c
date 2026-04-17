@@ -10,7 +10,7 @@ int _printf(const char *format, ...)
 {
 	va_list args;
 	int count = 0, i = 0, j;
-	int flag_plus, flag_space, flag_hash, flag_zero;
+	int flag_plus, flag_space, flag_hash, flag_zero, flag_minus;
 	int len_long, len_short;
 	int width, out_len;
 	int precision, actual_digits, num_zeros, zero_case, str_len;
@@ -41,8 +41,9 @@ int _printf(const char *format, ...)
 			flag_space = 0;
 			flag_hash = 0;
 			flag_zero = 0;
+			flag_minus = 0;
 			while (format[i] == '+' || format[i] == ' ' ||
-				format[i] == '#' || format[i] == '0')
+				format[i] == '#' || format[i] == '0' || format[i] == '-')
 			{
 				if (format[i] == '+')
 					flag_plus = 1;
@@ -50,8 +51,10 @@ int _printf(const char *format, ...)
 					flag_space = 1;
 				else if (format[i] == '#')
 					flag_hash = 1;
-				else
+				else if (format[i] == '0')
 					flag_zero = 1;
+				else
+					flag_minus = 1;
 				i++;
 			}
 			width = 0;
@@ -105,13 +108,15 @@ int _printf(const char *format, ...)
 			}
 			if (format[i] == 'c')
 			{
-				if (width > 1)
-					count += pad_spaces(width - 1, buffer, &buff_ind);
 				c = va_arg(args, int);
+				if (width > 1 && !flag_minus)
+					count += pad_spaces(width - 1, buffer, &buff_ind);
 				buffer[buff_ind++] = c;
 				if (buff_ind == BUFF_SIZE)
 					print_buffer(buffer, &buff_ind);
 				count++;
+				if (width > 1 && flag_minus)
+					count += pad_spaces(width - 1, buffer, &buff_ind);
 			}
 			else if (format[i] == 's')
 			{
@@ -123,7 +128,7 @@ int _printf(const char *format, ...)
 				str_len = j;
 				if (precision >= 0 && precision < str_len)
 					str_len = precision;
-				if (width > str_len)
+				if (width > str_len && !flag_minus)
 					count += pad_spaces(width - str_len, buffer, &buff_ind);
 				for (j = 0; j < str_len; j++)
 				{
@@ -132,6 +137,8 @@ int _printf(const char *format, ...)
 						print_buffer(buffer, &buff_ind);
 					count++;
 				}
+				if (width > str_len && flag_minus)
+					count += pad_spaces(width - str_len, buffer, &buff_ind);
 			}
 			else if (format[i] == 'd' || format[i] == 'i')
 			{
@@ -153,7 +160,7 @@ int _printf(const char *format, ...)
 				out_len = num_zeros + actual_digits;
 				if (ln < 0 || flag_plus || flag_space)
 					out_len++;
-				if (width > out_len && !(flag_zero && precision < 0))
+				if (width > out_len && !flag_minus && !(flag_zero && precision < 0))
 					count += pad_spaces(width - out_len, buffer, &buff_ind);
 				if (ln < 0)
 				{
@@ -176,7 +183,7 @@ int _printf(const char *format, ...)
 						print_buffer(buffer, &buff_ind);
 					count++;
 				}
-				if (width > out_len && flag_zero && precision < 0)
+				if (width > out_len && !flag_minus && flag_zero && precision < 0)
 				{
 					for (j = 0; j < width - out_len; j++)
 					{
@@ -195,6 +202,8 @@ int _printf(const char *format, ...)
 				}
 				if (!zero_case)
 					count += print_ulong(uln, buffer, &buff_ind);
+				if (width > out_len && flag_minus)
+					count += pad_spaces(width - out_len, buffer, &buff_ind);
 			}
 			else if (format[i] == 'b')
 			{
@@ -214,9 +223,9 @@ int _printf(const char *format, ...)
 				if (precision > actual_digits)
 					num_zeros = precision - actual_digits;
 				out_len = num_zeros + actual_digits;
-				if (width > out_len && !(flag_zero && precision < 0))
+				if (width > out_len && !flag_minus && !(flag_zero && precision < 0))
 					count += pad_spaces(width - out_len, buffer, &buff_ind);
-				if (width > out_len && flag_zero && precision < 0)
+				if (width > out_len && !flag_minus && flag_zero && precision < 0)
 				{
 					for (j = 0; j < width - out_len; j++)
 					{
@@ -235,6 +244,8 @@ int _printf(const char *format, ...)
 				}
 				if (!zero_case)
 					count += print_ulong(uln, buffer, &buff_ind);
+				if (width > out_len && flag_minus)
+					count += pad_spaces(width - out_len, buffer, &buff_ind);
 			}
 			else if (format[i] == 'o')
 			{
@@ -260,9 +271,9 @@ int _printf(const char *format, ...)
 						num_zeros = 1;
 				}
 				out_len = num_zeros + actual_digits;
-				if (width > out_len && !(flag_zero && precision < 0))
+				if (width > out_len && !flag_minus && !(flag_zero && precision < 0))
 					count += pad_spaces(width - out_len, buffer, &buff_ind);
-				if (width > out_len && flag_zero && precision < 0)
+				if (width > out_len && !flag_minus && flag_zero && precision < 0)
 				{
 					for (j = 0; j < width - out_len; j++)
 					{
@@ -281,6 +292,8 @@ int _printf(const char *format, ...)
 				}
 				if (!zero_case && actual_digits > 0)
 					count += print_octal_long(uln, buffer, &buff_ind);
+				if (width > out_len && flag_minus)
+					count += pad_spaces(width - out_len, buffer, &buff_ind);
 			}
 			else if (format[i] == 'x')
 			{
@@ -298,7 +311,7 @@ int _printf(const char *format, ...)
 				out_len = num_zeros + actual_digits;
 				if (flag_hash && uln != 0)
 					out_len += 2;
-				if (width > out_len && !(flag_zero && precision < 0))
+				if (width > out_len && !flag_minus && !(flag_zero && precision < 0))
 					count += pad_spaces(width - out_len, buffer, &buff_ind);
 				if (flag_hash && uln != 0)
 				{
@@ -311,7 +324,7 @@ int _printf(const char *format, ...)
 						print_buffer(buffer, &buff_ind);
 					count++;
 				}
-				if (width > out_len && flag_zero && precision < 0)
+				if (width > out_len && !flag_minus && flag_zero && precision < 0)
 				{
 					for (j = 0; j < width - out_len; j++)
 					{
@@ -330,6 +343,8 @@ int _printf(const char *format, ...)
 				}
 				if (!zero_case && actual_digits > 0)
 					count += print_hex_long(uln, buffer, &buff_ind);
+				if (width > out_len && flag_minus)
+					count += pad_spaces(width - out_len, buffer, &buff_ind);
 			}
 			else if (format[i] == 'X')
 			{
@@ -347,7 +362,7 @@ int _printf(const char *format, ...)
 				out_len = num_zeros + actual_digits;
 				if (flag_hash && uln != 0)
 					out_len += 2;
-				if (width > out_len && !(flag_zero && precision < 0))
+				if (width > out_len && !flag_minus && !(flag_zero && precision < 0))
 					count += pad_spaces(width - out_len, buffer, &buff_ind);
 				if (flag_hash && uln != 0)
 				{
@@ -360,7 +375,7 @@ int _printf(const char *format, ...)
 						print_buffer(buffer, &buff_ind);
 					count++;
 				}
-				if (width > out_len && flag_zero && precision < 0)
+				if (width > out_len && !flag_minus && flag_zero && precision < 0)
 				{
 					for (j = 0; j < width - out_len; j++)
 					{
@@ -379,6 +394,8 @@ int _printf(const char *format, ...)
 				}
 				if (!zero_case && actual_digits > 0)
 					count += print_HEX_long(uln, buffer, &buff_ind);
+				if (width > out_len && flag_minus)
+					count += pad_spaces(width - out_len, buffer, &buff_ind);
 			}
 			else if (format[i] == 'S')
 			{
