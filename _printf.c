@@ -411,7 +411,20 @@ int _printf(const char *format, ...)
 			}
 			else if (format[i] == 'p')
 			{
-				count += print_pointer(va_arg(args, void *), buffer, &buff_ind);
+				{
+					void *ptr = va_arg(args, void *);
+					int p_len;
+
+					if (ptr == NULL)
+						p_len = 5;
+					else
+						p_len = 2 + count_digits((unsigned long int)ptr, 16);
+					if (width > p_len && !flag_minus)
+						count += pad_spaces(width - p_len, buffer, &buff_ind);
+					count += print_pointer(ptr, buffer, &buff_ind);
+					if (width > p_len && flag_minus)
+						count += pad_spaces(width - p_len, buffer, &buff_ind);
+				}
 			}
 			else if (format[i] == '%')
 			{
