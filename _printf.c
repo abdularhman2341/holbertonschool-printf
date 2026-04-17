@@ -401,6 +401,10 @@ int _printf(const char *format, ...)
 			{
 				count += print_custom_string(va_arg(args, char *), buffer, &buff_ind);
 			}
+			else if (format[i] == 'r')
+			{
+				count += print_reverse(va_arg(args, char *), buffer, &buff_ind);
+			}
 			else if (format[i] == 'p')
 			{
 				count += print_pointer(va_arg(args, void *), buffer, &buff_ind);

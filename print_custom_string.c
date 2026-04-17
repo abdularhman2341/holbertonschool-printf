@@ -48,3 +48,31 @@ int print_custom_string(char *str, char buffer[], int *buff_ind)
 	}
 	return (count);
 }
+
+/**
+ * print_reverse - prints a string in reverse
+ * @str: the string to print reversed
+ * @buffer: Array of chars
+ * @buff_ind: Index at which to add next char
+ *
+ * Return: number of characters printed
+ */
+int print_reverse(char *str, char buffer[], int *buff_ind)
+{
+	int len = 0, count = 0, i;
+
+	if (str == NULL)
+		str = "(null)";
+
+	while (str[len] != '\0')
+		len++;
+
+	for (i = len - 1; i >= 0; i--)
+	{
+		buffer[(*buff_ind)++] = str[i];
+		if (*buff_ind == BUFF_SIZE)
+			print_buffer(buffer, buff_ind);
+		count++;
+	}
+	return (count);
+}
