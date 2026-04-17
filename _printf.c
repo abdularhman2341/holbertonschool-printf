@@ -50,10 +50,20 @@ int _printf(const char *format, ...)
 				i++;
 			}
 			width = 0;
-			while (format[i] >= '0' && format[i] <= '9')
+			if (format[i] == '*')
 			{
-				width = width * 10 + (format[i] - '0');
+				width = va_arg(args, int);
+				if (width < 0)
+					width = 0;
 				i++;
+			}
+			else
+			{
+				while (format[i] >= '0' && format[i] <= '9')
+				{
+					width = width * 10 + (format[i] - '0');
+					i++;
+				}
 			}
 			len_long = 0;
 			len_short = 0;
