@@ -12,6 +12,7 @@ int _printf(const char *format, ...)
 	int count = 0, i = 0, j;
 	int flag_plus, flag_space, flag_hash;
 	int len_long, len_short;
+	int width, out_len;
 	long int ln;
 	unsigned long int uln;
 	char *str;
@@ -48,6 +49,12 @@ int _printf(const char *format, ...)
 					flag_hash = 1;
 				i++;
 			}
+			width = 0;
+			while (format[i] >= '0' && format[i] <= '9')
+			{
+				width = width * 10 + (format[i] - '0');
+				i++;
+			}
 			len_long = 0;
 			len_short = 0;
 			if (format[i] == 'l')
@@ -62,6 +69,8 @@ int _printf(const char *format, ...)
 			}
 			if (format[i] == 'c')
 			{
+				if (width > 1)
+					count += pad_spaces(width - 1, buffer, &buff_ind);
 				c = va_arg(args, int);
 				buffer[buff_ind++] = c;
 				if (buff_ind == BUFF_SIZE)
@@ -73,6 +82,10 @@ int _printf(const char *format, ...)
 				str = va_arg(args, char *);
 				if (str == NULL)
 					str = "(null)";
+				for (j = 0; str[j] != '\0'; j++)
+					;
+				if (width > j)
+					count += pad_spaces(width - j, buffer, &buff_ind);
 				for (j = 0; str[j] != '\0'; j++)
 				{
 					buffer[buff_ind++] = str[j];
@@ -89,6 +102,14 @@ int _printf(const char *format, ...)
 					ln = (short int)va_arg(args, int);
 				else
 					ln = va_arg(args, int);
+				if (ln < 0)
+					out_len = count_digits((unsigned long int)(-ln), 10) + 1;
+				else if (flag_plus || flag_space)
+					out_len = count_digits((unsigned long int)ln, 10) + 1;
+				else
+					out_len = count_digits((unsigned long int)ln, 10);
+				if (width > out_len)
+					count += pad_spaces(width - out_len, buffer, &buff_ind);
 				if (ln >= 0)
 				{
 					if (flag_plus)
@@ -123,6 +144,9 @@ int _printf(const char *format, ...)
 					uln = (unsigned short int)va_arg(args, unsigned int);
 				else
 					uln = va_arg(args, unsigned int);
+				out_len = count_digits(uln, 10);
+				if (width > out_len)
+					count += pad_spaces(width - out_len, buffer, &buff_ind);
 				if (len_long || len_short)
 					count += print_ulong(uln, buffer, &buff_ind);
 				else
@@ -136,6 +160,11 @@ int _printf(const char *format, ...)
 					uln = (unsigned short int)va_arg(args, unsigned int);
 				else
 					uln = va_arg(args, unsigned int);
+				out_len = count_digits(uln, 8);
+				if (flag_hash && uln != 0)
+					out_len++;
+				if (width > out_len)
+					count += pad_spaces(width - out_len, buffer, &buff_ind);
 				if (flag_hash && uln != 0)
 				{
 					buffer[buff_ind++] = '0';
@@ -156,6 +185,11 @@ int _printf(const char *format, ...)
 					uln = (unsigned short int)va_arg(args, unsigned int);
 				else
 					uln = va_arg(args, unsigned int);
+				out_len = count_digits(uln, 16);
+				if (flag_hash && uln != 0)
+					out_len += 2;
+				if (width > out_len)
+					count += pad_spaces(width - out_len, buffer, &buff_ind);
 				if (flag_hash && uln != 0)
 				{
 					buffer[buff_ind++] = '0';
@@ -180,6 +214,11 @@ int _printf(const char *format, ...)
 					uln = (unsigned short int)va_arg(args, unsigned int);
 				else
 					uln = va_arg(args, unsigned int);
+				out_len = count_digits(uln, 16);
+				if (flag_hash && uln != 0)
+					out_len += 2;
+				if (width > out_len)
+					count += pad_spaces(width - out_len, buffer, &buff_ind);
 				if (flag_hash && uln != 0)
 				{
 					buffer[buff_ind++] = '0';

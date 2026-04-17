@@ -38,6 +38,10 @@ int print_hex_long(unsigned long int n, char buffer[], int *buff_ind);
 
 int print_HEX_long(unsigned long int n, char buffer[], int *buff_ind);
 
+int count_digits(unsigned long int n, int base);
+
+int pad_spaces(int n, char buffer[], int *buff_ind);
+
 #endif /* MAIN_H */
 
 
