@@ -10,7 +10,7 @@ int _printf(const char *format, ...)
 {
 	va_list args;
 	int count = 0, i = 0, j;
-	int flag_plus, flag_space, flag_hash;
+	int flag_plus, flag_space, flag_hash, flag_zero;
 	int len_long, len_short;
 	int width, out_len;
 	int precision, actual_digits, num_zeros, zero_case, str_len;
@@ -40,14 +40,18 @@ int _printf(const char *format, ...)
 			flag_plus = 0;
 			flag_space = 0;
 			flag_hash = 0;
-			while (format[i] == '+' || format[i] == ' ' || format[i] == '#')
+			flag_zero = 0;
+			while (format[i] == '+' || format[i] == ' ' ||
+				format[i] == '#' || format[i] == '0')
 			{
 				if (format[i] == '+')
 					flag_plus = 1;
 				else if (format[i] == ' ')
 					flag_space = 1;
-				else
+				else if (format[i] == '#')
 					flag_hash = 1;
+				else
+					flag_zero = 1;
 				i++;
 			}
 			width = 0;
@@ -149,7 +153,7 @@ int _printf(const char *format, ...)
 				out_len = num_zeros + actual_digits;
 				if (ln < 0 || flag_plus || flag_space)
 					out_len++;
-				if (width > out_len)
+				if (width > out_len && !(flag_zero && precision < 0))
 					count += pad_spaces(width - out_len, buffer, &buff_ind);
 				if (ln < 0)
 				{
@@ -171,6 +175,16 @@ int _printf(const char *format, ...)
 					if (buff_ind == BUFF_SIZE)
 						print_buffer(buffer, &buff_ind);
 					count++;
+				}
+				if (width > out_len && flag_zero && precision < 0)
+				{
+					for (j = 0; j < width - out_len; j++)
+					{
+						buffer[buff_ind++] = '0';
+						if (buff_ind == BUFF_SIZE)
+							print_buffer(buffer, &buff_ind);
+						count++;
+					}
 				}
 				for (j = 0; j < num_zeros; j++)
 				{
@@ -200,8 +214,18 @@ int _printf(const char *format, ...)
 				if (precision > actual_digits)
 					num_zeros = precision - actual_digits;
 				out_len = num_zeros + actual_digits;
-				if (width > out_len)
+				if (width > out_len && !(flag_zero && precision < 0))
 					count += pad_spaces(width - out_len, buffer, &buff_ind);
+				if (width > out_len && flag_zero && precision < 0)
+				{
+					for (j = 0; j < width - out_len; j++)
+					{
+						buffer[buff_ind++] = '0';
+						if (buff_ind == BUFF_SIZE)
+							print_buffer(buffer, &buff_ind);
+						count++;
+					}
+				}
 				for (j = 0; j < num_zeros; j++)
 				{
 					buffer[buff_ind++] = '0';
@@ -236,8 +260,18 @@ int _printf(const char *format, ...)
 						num_zeros = 1;
 				}
 				out_len = num_zeros + actual_digits;
-				if (width > out_len)
+				if (width > out_len && !(flag_zero && precision < 0))
 					count += pad_spaces(width - out_len, buffer, &buff_ind);
+				if (width > out_len && flag_zero && precision < 0)
+				{
+					for (j = 0; j < width - out_len; j++)
+					{
+						buffer[buff_ind++] = '0';
+						if (buff_ind == BUFF_SIZE)
+							print_buffer(buffer, &buff_ind);
+						count++;
+					}
+				}
 				for (j = 0; j < num_zeros; j++)
 				{
 					buffer[buff_ind++] = '0';
@@ -264,7 +298,7 @@ int _printf(const char *format, ...)
 				out_len = num_zeros + actual_digits;
 				if (flag_hash && uln != 0)
 					out_len += 2;
-				if (width > out_len)
+				if (width > out_len && !(flag_zero && precision < 0))
 					count += pad_spaces(width - out_len, buffer, &buff_ind);
 				if (flag_hash && uln != 0)
 				{
@@ -276,6 +310,16 @@ int _printf(const char *format, ...)
 					if (buff_ind == BUFF_SIZE)
 						print_buffer(buffer, &buff_ind);
 					count++;
+				}
+				if (width > out_len && flag_zero && precision < 0)
+				{
+					for (j = 0; j < width - out_len; j++)
+					{
+						buffer[buff_ind++] = '0';
+						if (buff_ind == BUFF_SIZE)
+							print_buffer(buffer, &buff_ind);
+						count++;
+					}
 				}
 				for (j = 0; j < num_zeros; j++)
 				{
@@ -303,7 +347,7 @@ int _printf(const char *format, ...)
 				out_len = num_zeros + actual_digits;
 				if (flag_hash && uln != 0)
 					out_len += 2;
-				if (width > out_len)
+				if (width > out_len && !(flag_zero && precision < 0))
 					count += pad_spaces(width - out_len, buffer, &buff_ind);
 				if (flag_hash && uln != 0)
 				{
@@ -315,6 +359,16 @@ int _printf(const char *format, ...)
 					if (buff_ind == BUFF_SIZE)
 						print_buffer(buffer, &buff_ind);
 					count++;
+				}
+				if (width > out_len && flag_zero && precision < 0)
+				{
+					for (j = 0; j < width - out_len; j++)
+					{
+						buffer[buff_ind++] = '0';
+						if (buff_ind == BUFF_SIZE)
+							print_buffer(buffer, &buff_ind);
+						count++;
+					}
 				}
 				for (j = 0; j < num_zeros; j++)
 				{
