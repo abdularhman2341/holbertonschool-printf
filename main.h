@@ -28,6 +28,8 @@ int print_custom_string(char *str, char buffer[], int *buff_ind);
 
 int print_reverse(char *str, char buffer[], int *buff_ind);
 
+int print_rot13(char *str, char buffer[], int *buff_ind);
+
 int print_pointer(void *p, char buffer[], int *buff_ind);
 
 int print_long(long int n, char buffer[], int *buff_ind);

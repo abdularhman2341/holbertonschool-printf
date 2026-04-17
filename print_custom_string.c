@@ -76,3 +76,44 @@ int print_reverse(char *str, char buffer[], int *buff_ind)
 	}
 	return (count);
 }
+
+/**
+ * print_rot13 - prints a string encoded in rot13
+ * @str: the string to encode and print
+ * @buffer: Array of chars
+ * @buff_ind: Index at which to add next char
+ *
+ * Return: number of characters printed
+ */
+int print_rot13(char *str, char buffer[], int *buff_ind)
+{
+	int i, count = 0;
+	char c;
+
+	if (str == NULL)
+		str = "(null)";
+
+	for (i = 0; str[i] != '\0'; i++)
+	{
+		c = str[i];
+		if (c >= 'a' && c <= 'z')
+		{
+			if (c <= 'm')
+				c = c + 13;
+			else
+				c = c - 13;
+		}
+		else if (c >= 'A' && c <= 'Z')
+		{
+			if (c <= 'M')
+				c = c + 13;
+			else
+				c = c - 13;
+		}
+		buffer[(*buff_ind)++] = c;
+		if (*buff_ind == BUFF_SIZE)
+			print_buffer(buffer, buff_ind);
+		count++;
+	}
+	return (count);
+}
