@@ -86,5 +86,5 @@ _printf("%%\n");                // Output: %
 
 ## Author
 
-Shouq  
-Abdulrahman
+Shouq  alqarni
+Abdulrahman alsiri
