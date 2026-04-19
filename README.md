@@ -1,341 +1,405 @@
-# =============================================================================
-#                           _PRINTF() FULL DOCUMENTATION
-# =============================================================================
+# _printf()
 
-# NAME
-# -----------------------------------------------------------------------------
-# _printf - custom formatted output conversion function
+> A custom implementation of the standard C function `printf`, built from scratch
+> using low-level system calls, buffer optimization, and modular architecture.
 
-# SYNOPSIS
-# -----------------------------------------------------------------------------
-#   #include "main.h"
-#   int _printf(const char *format, ...);
+---
 
-# OVERVIEW
-# -----------------------------------------------------------------------------
-#   _printf is a custom implementation of the standard printf function.
-#   It produces formatted output and writes it to the standard output stream.
-#
-#   This implementation focuses on:
-#       - Understanding variadic functions
-#       - Low-level output handling (write system call)
-#       - Modular and extensible design
-#       - Efficient buffering strategies
-#
-#   It supports a limited but expandable set of format specifiers.
+## Overview
 
-# DESIGN GOALS
-# -----------------------------------------------------------------------------
-#   1. Simplicity → easy to understand structure
-#   2. Modularity → separated logic per functionality
-#   3. Efficiency → reduced system calls using buffering
-#   4. Safety → handling NULL pointers and edge cases
-#   5. Extensibility → easy addition of new specifiers
+`_printf` recreates the behavior of the standard `printf` function.
 
-# FORMAT STRING STRUCTURE
-# -----------------------------------------------------------------------------
-#   The format string consists of:
-#
-#   [1] Literal Characters
-#       Printed directly without modification
-#
-#   [2] Conversion Specifiers
-#       Begin with '%' and modify how arguments are printed
-#
-#   Example:
-#       "Hello %s, number %d"
-#
-#   Processing Steps:
-#       - Read character
-#       - If not '%': print directly
-#       - If '%': parse next character
-#       - Call appropriate handler
+It converts formatted input into output written to `stdout`.
 
-# SUPPORTED SPECIFIERS (CORE)
-# -----------------------------------------------------------------------------
-#   %c      → character
-#   %s      → string
-#   %d      → integer (decimal)
-#   %i      → integer (decimal)
-#   %%      → percent symbol
+This project focuses on:
+- Understanding internal mechanics of formatted output
+- Controlling memory and execution flow
+- Building a modular and extensible system
 
-# EXTENDED / ADVANCED SPECIFIERS
-# -----------------------------------------------------------------------------
-#   %b      → binary representation of unsigned int
-#   %S      → string with non-printable characters converted to hex
+---
 
-# INTERNAL ARCHITECTURE
-# -----------------------------------------------------------------------------
-#   The system is composed of:
-#
-#   +-------------------+
-#   |     _printf       |
-#   +-------------------+
-#            |
-#            v
-#   +-------------------+
-#   | Specifier Parser  |
-#   +-------------------+
-#            |
-#   -----------------------------
-#   |       |        |          |
-#   v       v        v          v
-# print_c  print_s  print_d   others
-#
-#            |
-#            v
-#   +-------------------+
-#   | Buffer Manager    |
-#   +-------------------+
-#            |
-#            v
-#         write()
+## Why This Project Matters
 
-# VARIADIC FUNCTION MECHANISM
-# -----------------------------------------------------------------------------
-#   _printf uses <stdarg.h>:
-#
-#   va_list args;
-#   va_start(args, format);
-#
-#   Each specifier:
-#       va_arg(args, type)
-#
-#   va_end(args);
+Instead of using `printf`, this project shows:
+- How arguments are passed dynamically
+- How format strings are interpreted
+- How output is generated at system level
 
-# CHARACTER OUTPUT HANDLING
-# -----------------------------------------------------------------------------
-#   Characters are NOT written directly each time.
-#
-#   Instead:
-#       - Stored in buffer
-#       - Flushed when needed
-#
-#   This reduces system calls:
-#       write() is expensive
-#
-#   Buffer Example:
-#       char buffer[1024];
-#       int index;
+This is essential for:
+- Systems programming
+- Debugging low-level applications
+- Cybersecurity (memory + control flow awareness)
 
-# BUFFER MANAGEMENT STRATEGY
-# -----------------------------------------------------------------------------
-#   1. Add characters to buffer
-#   2. If buffer full:
-#           flush using write()
-#   3. Continue writing
-#
-#   Advantages:
-#       - Performance improvement
-#       - Reduced kernel interaction
+---
 
-# INTEGER PRINTING (DETAILED)
-# -----------------------------------------------------------------------------
-#   Steps:
-#
-#   1. Detect sign
-#   2. Convert negative to positive
-#   3. Recursively print digits
-#
-#   Example:
-#       Input: -123
-#
-#       Output Flow:
-#           '-'
-#           print(1)
-#           print(2)
-#           print(3)
-#
-#   Recursion Tree:
-#       123
-#       └── 12
-#           └── 1
+## Core Features
 
-# BINARY CONVERSION (%b)
-# -----------------------------------------------------------------------------
-#   Algorithm:
-#
-#   while (n > 0):
-#       remainder = n % 2
-#       store remainder
-#       n = n / 2
-#
-#   Print in reverse order
-#
-#   Example:
-#       5 → 101
+| Feature          | Description                |
+|-----------------|--------------------------|
+| %c              | Character                 |
+| %s              | String                    |
+| %d / %i         | Integer                   |
+| %%              | Percent sign              |
 
-# SPECIAL STRING (%S)
-# -----------------------------------------------------------------------------
-#   Rules:
-#
-#   if ASCII < 32 OR >= 127:
-#       print as \xHH
-#
-#   else:
-#       print normally
-#
-#   Example:
-#       "A\n" → A\x0A
+---
 
-# ERROR HANDLING
-# -----------------------------------------------------------------------------
-#   Cases handled:
-#
-#   1. format == NULL
-#       return -1
-#
-#   2. write() failure
-#       return -1
-#
-#   3. Unknown specifier
-#       print as-is OR ignore
+## Advanced Features
 
-# EDGE CASES
-# -----------------------------------------------------------------------------
-#   _printf("")
-#   _printf(NULL)
-#   _printf("%")
-#   _printf("%s", NULL)
-#   _printf("%d", INT_MIN)
+### Binary (%b)
 
-# TIME COMPLEXITY
-# -----------------------------------------------------------------------------
-#   O(n)
-#
-#   Where n = length of format string
+Converts integer to binary.
 
-# SPACE COMPLEXITY
-# -----------------------------------------------------------------------------
-#   O(1)
-#
-#   Fixed buffer size
+```c
+_printf("%b\n", 5);
+```
 
-# RECURSION DEPTH
-# -----------------------------------------------------------------------------
-#   Depends on digits count:
-#
-#   max for int:
-#       10 calls (32-bit int)
+Output:
+```
+101
+```
 
-# EXTENSIBILITY DESIGN
-# -----------------------------------------------------------------------------
-#   Specifiers handled using:
-#
-#   struct format_handler {
-#       char spec;
-#       int (*func)(va_list);
-#   };
-#
-#   Adding new specifier:
-#       - define function
-#       - add to array
+---
 
-# FILE STRUCTURE
-# -----------------------------------------------------------------------------
-#   main.h
-#   _printf.c
-#   handlers.c
-#   buffer.c
-#   utils.c
+### Special String (%S)
 
-# COMPILATION
-# -----------------------------------------------------------------------------
-#   gcc -Wall -Wextra -Werror -pedantic *.c -o printf
+Non-printable characters are converted to hex.
 
-# USAGE
-# -----------------------------------------------------------------------------
-#   ./printf
+```c
+_printf("%S\n", "Hi\n");
+```
 
-# EXAMPLES (DETAILED)
-# -----------------------------------------------------------------------------
-#   _printf("Hello\n");
-#   _printf("%c\n", 'A');
-#   _printf("%s\n", "Test");
-#   _printf("%d\n", 100);
-#   _printf("%i\n", -20);
-#   _printf("%b\n", 7);
-#   _printf("%S\n", "Hi\n");
-#   _printf("%%\n");
+Output:
+```
+Hi\x0A
+```
 
-# SAMPLE OUTPUT TRACE
-# -----------------------------------------------------------------------------
-#   Input:
-#       "Value: %d"
-#
-#   Steps:
-#       'V' → print
-#       'a' → print
-#       ...
-#       '%' → detect
-#       'd' → call print_int
-#
-#   Output:
-#       Value: 10
+---
 
-# COMPARISON WITH STANDARD printf
-# -----------------------------------------------------------------------------
-#   Feature              _printf      printf
-#   -----------------------------------------
-#   Basic Output         YES          YES
-#   Buffering            YES          YES
-#   Floating Point       NO           YES
-#   Width/Precision      NO           YES
-#   Learning Value       HIGH         LOW
+## Internal Architecture (UML Style)
 
-# TESTING PLAN
-# -----------------------------------------------------------------------------
-#   Categories:
-#
-#   1. Functional tests
-#   2. Boundary tests
-#   3. Stress tests
-#
-#   Examples:
-#       _printf("%d", 0);
-#       _printf("%d", -999999);
-#       _printf("%s", "");
-#       _printf("%c", 'Z');
+```
++------------------+
+|     _printf      |
++------------------+
+         |
+         v
++------------------+
+| Format Parser    |
++------------------+
+         |
+   -------------------
+   |   |   |   |    |
+   v   v   v   v    v
+  %c  %s  %d  %b   %S
+   |   |   |   |    |
+   v   v   v   v    v
+ print handlers
+         |
+         v
++------------------+
+| Buffer Manager   |
++------------------+
+         |
+         v
+      write()
+```
 
-# DEBUGGING STRATEGY
-# -----------------------------------------------------------------------------
-#   - Print intermediate values
-#   - Check buffer state
-#   - Validate recursion output
+---
 
-# LIMITATIONS
-# -----------------------------------------------------------------------------
-#   Does NOT support:
-#
-#   - floating points (%f)
-#   - width/precision
-#   - flags
-#   - scientific notation
+## Execution Flow (Detailed)
 
-# FUTURE IMPROVEMENTS
-# -----------------------------------------------------------------------------
-#   - add %x, %o, %u
-#   - support flags
-#   - support floating point
-#   - dynamic buffer
+Example:
+```c
+_printf("Value: %d", 10);
+```
 
-# SECURITY CONSIDERATIONS
-# -----------------------------------------------------------------------------
-#   - avoid buffer overflow
-#   - validate pointers
-#   - limit recursion depth
+### Step-by-step:
 
-# BEST PRACTICES USED
-# -----------------------------------------------------------------------------
-#   - modular code
-#   - clear naming
-#   - separation of concerns
-#   - efficient I/O
+1. Read 'V' → print  
+2. Read 'a' → print  
+3. Continue...  
+4. Read '%' → special case  
+5. Next char 'd' → integer handler  
+6. Call `print_int(10)`  
+7. Convert → '1' '0'  
+8. Add to buffer  
+9. Flush buffer  
 
-# AUTHOR
-# -----------------------------------------------------------------------------
-#   Shouq Alqarni
-#   Abdulrahman Alsiri
+Final Output:
+```
+Value: 10
+```
 
-# END OF DOCUMENT
-# =============================================================================
+---
+
+## Parsing Logic (Pseudo Code)
+
+```
+for each character in format:
+    if character != '%':
+        print character
+    else:
+        next = next character
+        find matching function
+        call function
+```
+
+---
+
+## Variadic Function Internals
+
+```
+va_list args;
+va_start(args, format);
+
+value = va_arg(args, int);
+
+va_end(args);
+```
+
+### What happens internally:
+
+- Arguments stored in stack
+- va_arg retrieves them sequentially
+- Order matters strictly
+
+---
+
+## Memory & Stack Behavior
+
+When calling:
+
+```c
+_printf("%d %c", 10, 'A');
+```
+
+Stack layout (simplified):
+
+```
+| 'A'        |
+| 10         |
+| format ptr |
+```
+
+va_arg reads:
+1. 10
+2. 'A'
+
+---
+
+## Buffer System (Deep Explanation)
+
+Instead of:
+
+```
+write(1, &c, 1);
+```
+
+We use:
+
+```
+buffer[index++] = c;
+```
+
+When full:
+
+```
+write(1, buffer, size);
+index = 0;
+```
+
+### Why this matters:
+
+- Reduces system calls
+- Improves performance
+- Mimics real-world libraries
+
+---
+
+## Integer Printing (Recursion Explained)
+
+For `123`:
+
+```
+print(123)
+ → print(12)
+   → print(1)
+     → print '1'
+   → print '2'
+ → print '3'
+```
+
+This ensures correct order.
+
+---
+
+## Binary Conversion Logic
+
+```
+while (n > 0):
+    remainder = n % 2
+    store remainder
+    n = n / 2
+reverse output
+```
+
+---
+
+## Special String Logic
+
+```
+if ASCII < 32 OR ASCII >= 127:
+    print "\x"
+    print hex value
+else:
+    print character
+```
+
+---
+
+## Error Handling
+
+| Case              | Behavior        |
+|------------------|----------------|
+| NULL format       | return -1      |
+| write failure     | return -1      |
+| unknown specifier | safe handling  |
+
+---
+
+## Edge Cases
+
+- Empty string
+- NULL pointer
+- Large integers
+- Negative numbers
+- Multiple specifiers
+
+---
+
+## Complexity Analysis
+
+### Time
+```
+O(n)
+```
+
+### Space
+```
+O(1)
+```
+
+---
+
+## Extensibility Design
+
+Handler structure:
+
+```c
+struct specifier {
+    char spec;
+    int (*func)(va_list);
+};
+```
+
+Adding new specifier:
+1. Create function
+2. Add to struct
+3. Link in parser
+
+---
+
+## Testing Strategy
+
+### Functional Tests
+```
+_printf("Hello");
+_printf("%d", 0);
+```
+
+### Edge Tests
+```
+_printf("%s", NULL);
+_printf("%d", -9999);
+```
+
+### Stress Tests
+```
+_printf("Long long long string...");
+```
+
+---
+
+## Debugging Strategy
+
+- Trace format parsing
+- Check buffer contents
+- Validate recursion output
+
+---
+
+## Security Perspective (Important)
+
+This project relates to cybersecurity:
+
+### Risks:
+- Buffer overflow
+- Invalid memory access
+- Format string vulnerabilities
+
+### Protection:
+- Controlled buffer
+- Input validation
+- Safe NULL handling
+
+---
+
+## Comparison with Standard printf
+
+| Feature        | _printf | printf |
+|---------------|--------|--------|
+| Basic output  | Yes    | Yes    |
+| Buffering     | Yes    | Yes    |
+| Floating      | No     | Yes    |
+| Flags         | No     | Yes    |
+
+---
+
+## Limitations
+
+- No floating-point support
+- No width/precision
+- No flags
+- Limited specifiers
+
+---
+
+## Future Improvements
+
+- Add `%x`, `%o`, `%u`
+- Add `%f`
+- Support width & precision
+- Dynamic buffer resizing
+
+---
+
+## Compilation
+
+```bash
+gcc -Wall -Wextra -Werror -pedantic *.c -o printf
+```
+
+---
+
+## Usage
+
+```bash
+./printf
+```
+
+---
+
+## Authors
+
+**Shouq Alqarni**  
+**Abdulrahman Alsiri**
