@@ -41,3 +41,4 @@ int pad_spaces(int n, char buffer[], int *buff_ind)
 	}
 	return (n);
 }
+s
